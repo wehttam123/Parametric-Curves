@@ -11,17 +11,16 @@ using namespace std;
 int Program::width;
 int Program::height;
 
-//bool Program::hide;
-//double Program::speed;
-//float Program::r;
-//float Program::R;
-//float Program::n;
-//float Program::angle;
-//bool Program::rPressed;
-////bool Program::nPressed;
+bool Program::hide;
+bool Program::uPressed;
+bool Program::kPressed;
+
 double Program::u;	// Parameter
 int Program::k;		// Order
 int Program::m;		// # of Control Points - 1
+
+std::vector<glm::vec2> Program::E;	//Control Values
+std::vector<int> Program::U;		//Knot Values
 
 Program::Program() {
 	window = nullptr;
@@ -44,24 +43,7 @@ void Program::start() {
 	//Program::rPressed = false;
 	//Program::nPressed = false;
 
-	cout << "--Hypocycloid Simulator--\n\n";
-
-	cout << "To increase/decrease the radius of the small circle,\n";
-	cout << "Hold down (r) and use the left and right arrow keys.\n\n";
-
-	cout << "To increase/decrease the radius of the large circle,\n";
-	cout << "Hold down (r) and use the up and down arrow keys.\n\n";
-
-	cout << "To increase/decrease the number of cycles,\n";
-	cout << "Hold down (n) and use the left and right arrow keys.\n\n";
-
-	cout << "To rotate the hypocycloid, click and drag with the mouse.\n\n";
-
-	cout << "To scale the hypocycloid, scroll up and down.\n\n";
-
-	cout << "To increase/decrease the speed of the animation use the left and right arrow keys.\n\n";
-
-	cout << "To hide/display the animation press (d) or (h).\n\n";
+	cout << "--Parametric B-Splines--\n\n";
 
 	renderEngine = new RenderEngine(window);
 	InputHandler::setUp(renderEngine);
@@ -93,14 +75,12 @@ void Program::setupWindow() {
 // Main loop
 void Program::mainLoop() {
 
-	//Program::hide = false;
+	Program::hide = false;
 
-	Program::u = 0.0;	// Parameter
-	Program::k = 0;		// Order
-	Program::m = 0;		// # of Control Points - 1
+	Program::u = 0.5;	// Parameter
+	Program::k = 4;		// Order
+	Program::m = 3;		// # of Control Points - 1
 
-	std::vector<glm::vec2> E;			//Control Values
-	std::vector<int> U;					//Knot Values
 	std::vector<Geometry> P;			//Control Points
 	std::vector<Geometry> G;			//Geometry Objects
 	std::vector<glm::vec2> GP;			//Geometry Points
@@ -113,18 +93,6 @@ void Program::mainLoop() {
 	E.push_back(glm::vec2(4, 4));
 	E.push_back(glm::vec2(4, 0));
 
-	Program::k = 4;
-	Program::m = 3;
-
-	for (int i = 0; i <= (m + k + 1); i++) {
-		if (i > 3) {
-			U.push_back(1);
-		}
-		else {
-			U.push_back(0);
-		}
-	}
-
 	std::vector<glm::vec2> C(E.size());	//Vertices
 
 	while (!glfwWindowShouldClose(window)) {
@@ -132,30 +100,17 @@ void Program::mainLoop() {
 		glfwPollEvents();
 		glLineWidth(3);
 
-		// Hide
-		//HideCircle = Geometry::makeCircle(100.0, 0.0, 0.0, 1.0, 1.0, 1.0, Program::hide);
+		U.clear();
 
-		//Program::k = 4;
-		//Program::m = 3;
-
-		//E.clear();
-		//U.clear();
-
-		//for (int i = 0; i <= m; i++) {
-			//E.push_back(glm::vec2(-4, 0));
-			//E.push_back(glm::vec2(-4, 4));
-			//E.push_back(glm::vec2(4, 4));
-			//E.push_back(glm::vec2(4, 0));
-		//}
-
-		//for (int i = 0; i <= m+k+1; i++) {
-		//	if (i > 3) {
-		//		U.push_back(1);
-		//	}
-		//	else {
-		//		U.push_back(0);
-		//	}
-		//}
+		for (int i = 0; i <= (m + k + 1); i++) {
+			int j = ((m + k + 1) / 2) - 1;
+			if (i > j) {
+				U.push_back(1);
+			}
+			else {
+				U.push_back(0);
+			}
+		}
 
 		// Build B-spline
 		Spline = Geometry::makeBspline(Program::k, Program::m, E, U, C);
@@ -163,8 +118,6 @@ void Program::mainLoop() {
 		/*** Calculations for Additional objects in scene ***/
 
 		//Geometry
-		Program::u = Program::u += 0.01;
-		if (Program::u > 1.0) { Program::u = 0.0; }
 
 		float x = 0.0;
 		float y = 0.0;
@@ -212,20 +165,34 @@ void Program::mainLoop() {
 
 		for (int i = 0; i < GP.size(); i++) {
 			if (i > 0) {
-				G.push_back(Geometry::makeLine(GP.at(i).x, GP.at(i).y, GP.at(i-1).x, GP.at(i-1).y));
+				G.push_back(Geometry::makeLine(GP.at(i).x, GP.at(i).y, GP.at(i - 1).x, GP.at(i - 1).y));
 			}
 		}
 
-		for (int i = 0; i < P.size(); i++) {
-			renderEngine->assignBuffers(P.at(i));
-			renderEngine->updateBuffers(P.at(i));
-			objects.push_back(&P.at(i));
-		}
+		if (Program::hide == false) {
+			for (int i = 0; i < P.size(); i++) {
+				renderEngine->assignBuffers(P.at(i));
+				renderEngine->updateBuffers(P.at(i));
+				objects.push_back(&P.at(i));
+			}
 
-		for (int i = 0; i < G.size(); i++) {
-			renderEngine->assignBuffers(G.at(i));
-			renderEngine->updateBuffers(G.at(i));
-			objects.push_back(&G.at(i));
+			for (int i = 0; i < G.size(); i++) {
+				renderEngine->assignBuffers(G.at(i));
+				renderEngine->updateBuffers(G.at(i));
+				objects.push_back(&G.at(i));
+			}
+		} else {
+			P.clear();
+			for (int i = 0; i < E.size(); i++) {
+				P.push_back(Geometry::makeCircle(0.2, E.at(i).x, E.at(i).y, 0.0, 0.0, 0.0, true));
+				GP.push_back(glm::vec2(E.at(i).x, E.at(i).y));
+			}
+
+			for (int i = 0; i < P.size(); i++) {
+				renderEngine->assignBuffers(P.at(i));
+				renderEngine->updateBuffers(P.at(i));
+				objects.push_back(&P.at(i));
+			}
 		}
 
 		//Render Spline

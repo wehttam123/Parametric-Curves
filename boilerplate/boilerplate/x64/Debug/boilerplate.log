@@ -1,8 +1,4 @@
-﻿  Program.cpp
-s:\documents\github\parametric-curves\boilerplate\boilerplate\program.cpp(178): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-s:\documents\github\parametric-curves\boilerplate\boilerplate\program.cpp(179): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-s:\documents\github\parametric-curves\boilerplate\boilerplate\program.cpp(185): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-s:\documents\github\parametric-curves\boilerplate\boilerplate\program.cpp(187): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-s:\documents\github\parametric-curves\boilerplate\boilerplate\program.cpp(191): warning C4305: 'argument': truncation from 'double' to 'float'
-s:\documents\github\parametric-curves\boilerplate\boilerplate\program.cpp(209): warning C4305: 'argument': truncation from 'double' to 'float'
+﻿  InputHandler.cpp
+s:\documents\github\parametric-curves\boilerplate\boilerplate\inputhandler.cpp(125): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+s:\documents\github\parametric-curves\boilerplate\boilerplate\inputhandler.cpp(126): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
   boilerplate.vcxproj -> S:\Documents\GitHub\Parametric-Curves\boilerplate\x64\Debug\boilerplate.exe

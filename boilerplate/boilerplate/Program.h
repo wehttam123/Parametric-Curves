@@ -20,18 +20,15 @@ public:
 	static int width;
 	static int height;
 
-	//static bool hide;
-	//static double speed;
-	//static float r;
-	//static float R;
-	//static float n;
-	//static float angle;
-	//static float scale;
-	//static bool rPressed;
-	//static bool nPressed;
+	static bool hide;
+	static bool kPressed;
+	static bool uPressed;
 	static double u;	// Parameter
 	static int k;		// Order
 	static int m;		// # of Control Points - 1
+
+	static std::vector<glm::vec2> E;	//Control Values
+	static std::vector<int> U;			//Knot Values
 
 private:
 	GLFWwindow* window;
@@ -39,13 +36,6 @@ private:
 
 	std::vector<Geometry*> objects;
 
-	//Geometry Hypocycloid;
-	//Geometry OuterCircle;
-	//Geometry InnerCircle;
-	//Geometry MiddleDot;
-	//Geometry EdgeDot;
-	//Geometry Radius;
-	//Geometry HideCircle;
 	Geometry Spline;
 	Geometry controlPoint;
 

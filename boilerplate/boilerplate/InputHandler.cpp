@@ -6,7 +6,11 @@
 RenderEngine* InputHandler::renderEngine;
 int InputHandler::mouseOldX;
 int InputHandler::mouseOldY;
-bool InputHandler::mousePressed = false;
+bool InputHandler::mouseLeft;
+bool InputHandler::mouseRight;
+int InputHandler::num = 0;
+bool mouseLeft = false;
+bool mouseRight = false;
 
 // Must be called before processing any GLFW events
 void InputHandler::setUp(RenderEngine* renderEngine) {
@@ -20,119 +24,121 @@ void InputHandler::key(GLFWwindow* window, int key, int scancode, int action, in
 		glfwTerminate();
 		exit(0);
 	}
-	/*
-	if (Program::rPressed) {
-		if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-			Program::r = Program::r + 0.01;
+
+	if (Program::uPressed) {
+		if (key == GLFW_KEY_RIGHT) {
+			if (Program::u <= 0.99) { Program::u = Program::u + 0.01; }
 		}
-		if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-			Program::r = Program::r - 0.01;
-		}
-		if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
-			Program::R = Program::R + 0.01;
-		}
-		if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
-			Program::R = Program::R - 0.01;
-		}
-		if (key == GLFW_KEY_RIGHT && action == GLFW_REPEAT) {
-			Program::r = Program::r + 0.01;
-		}
-		if (key == GLFW_KEY_LEFT && action == GLFW_REPEAT) {
-			Program::r = Program::r - 0.01;
-		}
-		if (key == GLFW_KEY_UP && action == GLFW_REPEAT) {
-			Program::R = Program::R + 0.01;
-		}
-		if (key == GLFW_KEY_DOWN && action == GLFW_REPEAT) {
-			Program::R = Program::R - 0.01;
+		if (key == GLFW_KEY_LEFT) {
+			if (Program::u >= 0.01) { Program::u = Program::u - 0.01; }
 		}
 	}
-	else if (Program::nPressed) {
+	else if (Program::kPressed) {
 		if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-			Program::n = Program::n + 1.0;
+			if (Program::k <= Program::m) { Program::k = Program::k + 1; }
 		}
 		if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-			Program::n = Program::n - 1.0;
-		}
-		if (key == GLFW_KEY_RIGHT && action == GLFW_REPEAT) {
-			Program::n = Program::n + 1.0;
-		}
-		if (key == GLFW_KEY_LEFT && action == GLFW_REPEAT) {
-			Program::n = Program::n - 1.0;
-		}
-	}
-	else {
-		if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-			Program::speed = Program::speed * 1.1;
-		}
-		if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-			Program::speed = Program::speed / 1.1;
-		}
-		if (key == GLFW_KEY_RIGHT && action == GLFW_REPEAT) {
-			Program::speed = Program::speed * 1.1;
-		}
-		if (key == GLFW_KEY_LEFT && action == GLFW_REPEAT) {
-			Program::speed = Program::speed / 1.1;
+			if (Program::k >= 0.0) { Program::k = Program::k - 1; }
 		}
 	}
 
-	if (key == GLFW_KEY_R && action == GLFW_PRESS) {
-		Program::rPressed = true;
-	} 
-	if (key == GLFW_KEY_R && action == GLFW_RELEASE) {
-		Program::rPressed = false;
-	}
-
-	if (key == GLFW_KEY_N && action == GLFW_PRESS) {
-		Program::nPressed = true;
-	}
-	if (key == GLFW_KEY_N && action == GLFW_RELEASE) {
-		Program::nPressed = false;
-	}
-
-	if (key == GLFW_KEY_D && action == GLFW_PRESS) {
+	if (key == GLFW_KEY_G && action == GLFW_PRESS) {
 		if (Program::hide) {
 			Program::hide = false;
-		} else {
+		}
+		else {
 			Program::hide = true;
 		}
 	}
 	if (key == GLFW_KEY_H && action == GLFW_PRESS) {
 		if (Program::hide) {
 			Program::hide = false;
-		} else {
+		}
+		else {
 			Program::hide = true;
 		}
-	}*/
+	}
+
+	if (key == GLFW_KEY_K) {
+		if (GLFW_PRESS == action)
+			Program::kPressed = true;
+		else if (GLFW_RELEASE == action)
+			Program::kPressed = false;
+	}
+
+	if (key == GLFW_KEY_U) {
+		if (GLFW_PRESS == action)
+			Program::uPressed = true;
+		else if (GLFW_RELEASE == action)
+			Program::uPressed = false;
+	}
+
+	if (key == GLFW_KEY_0 && action == GLFW_PRESS) {
+		num = 0;
+	}
+	if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
+		num = 1;
+	}
+	if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
+		num = 2;
+	}
+	if (key == GLFW_KEY_3 && action == GLFW_PRESS) {
+		num = 3;
+	}
+	if (key == GLFW_KEY_4 && action == GLFW_PRESS) {
+		num = 4;
+	}
+	if (key == GLFW_KEY_5 && action == GLFW_PRESS) {
+		num = 5;
+	}
+	if (key == GLFW_KEY_6 && action == GLFW_PRESS) {
+		num = 6;
+	}
+	if (key == GLFW_KEY_7 && action == GLFW_PRESS) {
+		num = 7;
+	}
+	if (key == GLFW_KEY_8 && action == GLFW_PRESS) {
+		num = 8;
+	}
+	if (key == GLFW_KEY_9 && action == GLFW_PRESS) {
+		num = 9;
+	}
 }
 
 // Callback for mouse button presses
 void InputHandler::mouse(GLFWwindow* window, int button, int action, int mods) {
+	if (button == GLFW_MOUSE_BUTTON_RIGHT && GLFW_RELEASE == action) {
+			mouseRight = true;
+	}
+
 	if (button == GLFW_MOUSE_BUTTON_LEFT) {
 		if (GLFW_PRESS == action)
-			mousePressed = true;
+			mouseLeft = true;
 		else if (GLFW_RELEASE == action)
-			mousePressed = false;
+			mouseLeft = false;
 	}
 }
 
 // Callback for mouse motion
 void InputHandler::motion(GLFWwindow* window, double x, double y) {
-	if (mousePressed)
-	{
-		//Program::angle = Program::angle + (((((x - mouseOldX)/50) + ((y - mouseOldY) / 50))/2) * (M_PI / 32));
+
+	float x1 = (x - (Program::width / 2))/(32);
+	float y1 = (-y + (Program::height / 2))/(32);
+
+	if (mouseLeft == true) {
+			Program::E.at(num).x = x1;
+			Program::E.at(num).y = y1;
 	}
-	mouseOldX = x;
-	mouseOldY = y;
 
+	if (mouseRight = true) {
+		
+		mouseRight = false;
+	}
 
-	//Program::angle = Program::angle + (y * (M_PI / 32));
 }
 
 // Callback for mouse scroll
 void InputHandler::scroll(GLFWwindow* window, double x, double y) {
-		//Program::r = Program::r * (1 + (0.01 * y));
-		//Program::R = Program::R * (1 + (0.01 * y));
 }
 
 // Callback for window reshape/resize
