@@ -4,20 +4,24 @@
 #include <cmath>
 #include <iostream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
 int Program::width;
 int Program::height;
 
-bool Program::hide;
-double Program::speed;
-float Program::r;
-float Program::R;
-float Program::n;
-float Program::angle;
-bool Program::rPressed;
-bool Program::nPressed;
+//bool Program::hide;
+//double Program::speed;
+//float Program::r;
+//float Program::R;
+//float Program::n;
+//float Program::angle;
+//bool Program::rPressed;
+////bool Program::nPressed;
+double Program::u;	// Parameter
+int Program::k;		// Order
+int Program::m;		// # of Control Points - 1
 
 Program::Program() {
 	window = nullptr;
@@ -37,8 +41,8 @@ void Program::start() {
 		std::cerr << glewGetErrorString(err) << std::endl;
 	}
 
-	Program::rPressed = false;
-	Program::nPressed = false;
+	//Program::rPressed = false;
+	//Program::nPressed = false;
 
 	cout << "--Hypocycloid Simulator--\n\n";
 
@@ -75,7 +79,7 @@ void Program::setupWindow() {
 	Program::height = 720;
 
 	glfwWindowHint(GLFW_SAMPLES, 16);
-	window = glfwCreateWindow(Program::width, Program::height, "CPSC 589 Assignment #1 Hypocycloid", NULL, NULL);
+	window = glfwCreateWindow(Program::width, Program::height, "CPSC 589 Assignment #2 Parametric Curves", NULL, NULL);
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(1); // V-sync on
 
@@ -89,28 +93,39 @@ void Program::setupWindow() {
 // Main loop
 void Program::mainLoop() {
 
-	Program::r = 4.0;	// Radius of small circle
-	Program::R = 6.0;	// Radius of larger circle
-	Program::n = 2.0;	// Number of cycles
+	//Program::hide = false;
 
-	Program::angle = 0.0;		// Rotation Angle
-	float scale = 1.0;		// Scale of Hypocycloid
-	double i = 0.0;			// Position along cycle
-	double u = 0.0;			// Position along Hypocycloid
-	Program::speed = 0.01;	// Animation speed
+	Program::u = 0.0;	// Parameter
+	Program::k = 0;		// Order
+	Program::m = 0;		// # of Control Points - 1
 
-	float x;	// X position
-	float y;	// Y position
-	float xr;	// X position rotated
-	float yr;	// Y position rotated
-	float xrm;	// X position rotated at middle of small circle
-	float yrm;	// Y position rotated at middle of small circle
+	std::vector<glm::vec2> E;			//Control Values
+	std::vector<int> U;					//Knot Values
+	std::vector<Geometry> P;			//Control Points
+	std::vector<Geometry> G;			//Geometry Objects
+	std::vector<glm::vec2> GP;			//Geometry Points
 
-	Program::hide = false;
+	E.clear();
+	U.clear();
 
-	// Adjust scale
-	Program::r = Program::r * scale;
-	Program::R = Program::R * scale;
+	E.push_back(glm::vec2(-4, 0));
+	E.push_back(glm::vec2(-4, 4));
+	E.push_back(glm::vec2(4, 4));
+	E.push_back(glm::vec2(4, 0));
+
+	Program::k = 4;
+	Program::m = 3;
+
+	for (int i = 0; i <= (m + k + 1); i++) {
+		if (i > 3) {
+			U.push_back(1);
+		}
+		else {
+			U.push_back(0);
+		}
+	}
+
+	std::vector<glm::vec2> C(E.size());	//Vertices
 
 	while (!glfwWindowShouldClose(window)) {
 
@@ -118,64 +133,105 @@ void Program::mainLoop() {
 		glLineWidth(3);
 
 		// Hide
-		HideCircle = Geometry::makeCircle(100.0, 0.0, 0.0, 1.0, 1.0, 1.0, Program::hide);
+		//HideCircle = Geometry::makeCircle(100.0, 0.0, 0.0, 1.0, 1.0, 1.0, Program::hide);
 
-		// Animation Position
-		if (i < Program::n) { 
-			i += Program::speed;
-		} else { 
-			i = 0.0; 
-		}
+		//Program::k = 4;
+		//Program::m = 3;
 
-		// Build Hypocycloid
-		Hypocycloid = Geometry::makeHypocycloid(Program::r, Program::R, i, Program::angle);
+		//E.clear();
+		//U.clear();
 
+		//for (int i = 0; i <= m; i++) {
+			//E.push_back(glm::vec2(-4, 0));
+			//E.push_back(glm::vec2(-4, 4));
+			//E.push_back(glm::vec2(4, 4));
+			//E.push_back(glm::vec2(4, 0));
+		//}
+
+		//for (int i = 0; i <= m+k+1; i++) {
+		//	if (i > 3) {
+		//		U.push_back(1);
+		//	}
+		//	else {
+		//		U.push_back(0);
+		//	}
+		//}
+
+		// Build B-spline
+		Spline = Geometry::makeBspline(Program::k, Program::m, E, U, C);
 
 		/*** Calculations for Additional objects in scene ***/
 
-		// Calculate Position
-		u = 2.0 * M_PI * i;
-		// Parametric Equations
-		x = ((Program::R - Program::r) * cos(u)) + (Program::r * cos(((Program::R - Program::r) / Program::r) * u));
-		y = ((Program::R - Program::r) * sin(u)) - (Program::r * sin(((Program::R - Program::r) / Program::r) * u));
-		// Adjust rotation
-		xr = (x * cos(Program::angle)) - (y * sin(Program::angle));
-		yr = (y * cos(Program::angle)) + (x * sin(Program::angle));
-		xrm = ((Program::R - Program::r)*cos(u) * cos(Program::angle)) - ((Program::R - Program::r)*sin(u) * sin(Program::angle));
-		yrm = ((Program::R - Program::r)*sin(u) * cos(Program::angle)) + ((Program::R - Program::r)*cos(u) * sin(Program::angle));
+		//Geometry
+		Program::u = Program::u += 0.01;
+		if (Program::u > 1.0) { Program::u = 0.0; }
 
-		// Build Objects
-		OuterCircle = Geometry::makeCircle(Program::R, 0.0, 0.0, 1.0, 0.5, 0.0, false);
-		InnerCircle = Geometry::makeCircle(Program::r, xrm, yrm, 0.0, 0.0, 0.0, false);
-		MiddleDot = Geometry::makeCircle(0.2, xrm, yrm, 0.0, 0.0, 0.0, true);
-		Radius = Geometry::makeLine(xr, yr, xrm, yrm);
-		EdgeDot = Geometry::makeCircle(0.2, xr, yr, 1.0, 0.0, 0.0, true);
+		float x = 0.0;
+		float y = 0.0;
 
-		// Render Objects
-		renderEngine->assignBuffers(HideCircle);
-		renderEngine->updateBuffers(HideCircle);
-		objects.push_back(&HideCircle);
-		renderEngine->assignBuffers(EdgeDot);
-		renderEngine->updateBuffers(EdgeDot);
-		objects.push_back(&EdgeDot);
-		renderEngine->assignBuffers(OuterCircle);
-		renderEngine->updateBuffers(OuterCircle);
-		objects.push_back(&OuterCircle);
-		renderEngine->assignBuffers(InnerCircle);
-		renderEngine->updateBuffers(InnerCircle);
-		objects.push_back(&InnerCircle);
-		renderEngine->assignBuffers(MiddleDot);
-		renderEngine->updateBuffers(MiddleDot);
-		objects.push_back(&MiddleDot);
-		renderEngine->assignBuffers(Radius);
-		renderEngine->updateBuffers(Radius);
-		objects.push_back(&Radius);
+		G.clear();
+		P.clear();
+		GP.clear();
 
+		for (int i = 0; i <= (k - 1); i++) {
 
-		// Render Hypocycloid
-		renderEngine->assignBuffers(Hypocycloid);
-		renderEngine->updateBuffers(Hypocycloid);
-		objects.push_back(&Hypocycloid);
+			C.at(i).x = E.at(Geometry::delta(m, k, u, U) - i).x;
+			C.at(i).y = E.at(Geometry::delta(m, k, u, U) - i).y;
+		}
+
+		float omega;
+
+		for (int r = k; r >= 2; r--) {
+			int i = Geometry::delta(m, k, u, U);
+			for (int s = 0; s <= (r - 2); s++) {
+				omega = (u - (float)(U.at(i))) / ((float)(U.at(i + r - 1)) - (float)(U.at(i)));
+				x = (omega * C.at(s).x) + ((1 - omega) * C.at(s + 1).x);
+				y = (omega * C.at(s).y) + ((1 - omega) * C.at(s + 1).y);
+
+				P.push_back(Geometry::makeCircle(0.15, x, y, 0.5, 0.5, 0.5, true));
+
+				GP.push_back(glm::vec2(x, y));
+
+				C.at(s).x = x;
+				C.at(s).y = y;
+				i = i - 1;
+			}
+
+			for (int i = 0; i < GP.size(); i++) {
+				if (i > 0) {
+					G.push_back(Geometry::makeLine(GP.at(i).x, GP.at(i).y, GP.at(i - 1).x, GP.at(i - 1).y));
+				}
+			}
+			GP.clear();
+		}
+
+		for (int i = 0; i < E.size(); i++) {
+			P.push_back(Geometry::makeCircle(0.2, E.at(i).x, E.at(i).y, 0.0, 0.0, 0.0, true));
+			GP.push_back(glm::vec2(E.at(i).x, E.at(i).y));
+		}
+
+		for (int i = 0; i < GP.size(); i++) {
+			if (i > 0) {
+				G.push_back(Geometry::makeLine(GP.at(i).x, GP.at(i).y, GP.at(i-1).x, GP.at(i-1).y));
+			}
+		}
+
+		for (int i = 0; i < P.size(); i++) {
+			renderEngine->assignBuffers(P.at(i));
+			renderEngine->updateBuffers(P.at(i));
+			objects.push_back(&P.at(i));
+		}
+
+		for (int i = 0; i < G.size(); i++) {
+			renderEngine->assignBuffers(G.at(i));
+			renderEngine->updateBuffers(G.at(i));
+			objects.push_back(&G.at(i));
+		}
+
+		//Render Spline
+		renderEngine->assignBuffers(Spline);
+		renderEngine->updateBuffers(Spline);
+		objects.push_back(&Spline);
 
 		renderEngine->render(objects, glm::mat4(1.f));
 		glfwSwapBuffers(window);

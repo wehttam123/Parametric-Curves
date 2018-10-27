@@ -22,4 +22,8 @@ public:
 	static Geometry makeCircle(float radius, float x, float y, float r, float g, float b, bool fill);
 	static Geometry makeHypocycloid(float r, float R, double n, float angle);
 	static Geometry makeLine(float x, float y, float x1, float y1);
+	static Geometry makeBspline(int k, int m, std::vector<glm::vec2> E, std::vector<int> U, std::vector<glm::vec2> C);
+
+	static int N(int i, int k, float u, std::vector<int> U);
+	static int delta(int m, int k, float u, std::vector<int> U);
 };

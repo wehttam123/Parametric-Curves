@@ -2,6 +2,7 @@
 #include "Geometry.h"
 
 #include <cmath>
+#include <vector>
 
 Geometry::Geometry() {
 	drawMode = GL_TRIANGLES;
@@ -72,7 +73,92 @@ Geometry Geometry::makeLine(float x, float y, float x1, float y1) {
 	line.verts.push_back(glm::vec3(x1, y1, 0));
 	line.colours.push_back(glm::vec3(0.f, 0.f, 0.f));
 
-	line.drawMode = GL_LINES;
+	line.drawMode = GL_LINE_STRIP;
 
 	return line;
+}
+
+Geometry Geometry::makeBspline(int k, int m, std::vector<glm::vec2> E, std::vector<int> U, std::vector<glm::vec2> C) {
+
+	int d;			//delta
+	float omega;	//omega
+
+	float x = 0.0;
+	float y = 0.0;
+
+	Geometry Spline;
+
+	//Efficient Algorithm
+	for (float u = 0.0; u <= 1.0; u += 0.01) {
+		d = delta(m, k, u, U);
+
+		for (int i = 0; i <= (k - 1); i++) {
+
+			C.at(i).x = E.at(d - i).x;
+			C.at(i).y = E.at(d - i).y;
+		}
+
+		for (int r = k; r >= 2; r--) {
+			int i = d;
+			for (int s = 0; s <= (r - 2); s++) {
+				omega = (u - (float)(U.at(i))) / ((float)(U.at(i + r - 1)) - (float)(U.at(i)));
+				C.at(s).x = (omega * C.at(s).x) + ((1-omega) * C.at(s+1).x);
+				C.at(s).y = (omega * C.at(s).y) + ((1-omega) * C.at(s+1).y);
+
+				i = i - 1;
+			}
+		}
+
+		Spline.verts.push_back(glm::vec3(C.at(0).x, C.at(0).y, 0));
+		Spline.colours.push_back(glm::vec3(1.f, 0.f, 0.f));
+	}
+
+	Spline.drawMode = GL_LINE_STRIP;
+	return Spline;
+}
+
+int Geometry::N(int i, int k, float u, std::vector<int> U)
+{
+	int n = 0;
+
+	if (k > 1) {
+		try {
+			float Ui = (float)(U.at(i));
+			float Uik = (float)(U.at(i + k));
+			float Ui1 = (float)(U.at(i + 1));
+			float Uik1 = (float)(U.at(i + k - 1));
+			n = (int)((((u - Ui) / (Uik1 - Ui))*N(i, k - 1, u, U)) + (((Uik - u) / (Uik - Ui1))*N(i + 1, k - 1, u, U)));
+		} catch (...) {
+			try {
+				if (u >= (float)(U.at(i)) and u <= (float)(U.at(i + 1))) {
+					n = 1;
+				}
+			} catch (...) {
+				n = 0;
+			}
+		}
+	}
+	else {
+		try {
+			if (u >= (float)(U.at(i)) and u <= (float)(U.at(i + 1))) {
+				n = 1;
+			}
+		}
+		catch (...) {
+			n = 0;
+		}
+	}
+
+	return n;
+}
+
+int Geometry::delta(int m, int k, float u, std::vector<int> U)
+{
+	for (int i = 0; i <= (m + k - 1); i++) {
+				if (u >= (float)(U.at(i)) and u < (float)(U.at(i + 1))) {
+					return i;
+				}
+	}
+
+	return -1;
 }

@@ -20,7 +20,7 @@ void InputHandler::key(GLFWwindow* window, int key, int scancode, int action, in
 		glfwTerminate();
 		exit(0);
 	}
-
+	/*
 	if (Program::rPressed) {
 		if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
 			Program::r = Program::r + 0.01;
@@ -103,7 +103,7 @@ void InputHandler::key(GLFWwindow* window, int key, int scancode, int action, in
 		} else {
 			Program::hide = true;
 		}
-	}
+	}*/
 }
 
 // Callback for mouse button presses
@@ -120,7 +120,7 @@ void InputHandler::mouse(GLFWwindow* window, int button, int action, int mods) {
 void InputHandler::motion(GLFWwindow* window, double x, double y) {
 	if (mousePressed)
 	{
-		Program::angle = Program::angle + (((((x - mouseOldX)/50) + ((y - mouseOldY) / 50))/2) * (M_PI / 32));
+		//Program::angle = Program::angle + (((((x - mouseOldX)/50) + ((y - mouseOldY) / 50))/2) * (M_PI / 32));
 	}
 	mouseOldX = x;
 	mouseOldY = y;
@@ -131,8 +131,8 @@ void InputHandler::motion(GLFWwindow* window, double x, double y) {
 
 // Callback for mouse scroll
 void InputHandler::scroll(GLFWwindow* window, double x, double y) {
-		Program::r = Program::r * (1 + (0.01 * y));
-		Program::R = Program::R * (1 + (0.01 * y));
+		//Program::r = Program::r * (1 + (0.01 * y));
+		//Program::R = Program::R * (1 + (0.01 * y));
 }
 
 // Callback for window reshape/resize
